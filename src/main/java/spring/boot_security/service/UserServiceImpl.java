@@ -1,9 +1,11 @@
 package spring.boot_security.service;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spring.boot_security.configs.WebSecurityConfig;
@@ -23,65 +25,49 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleServiceImpl roleService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, RoleServiceImpl roleService) {
+    public UserServiceImpl(UserRepository userRepository, RoleServiceImpl roleService,@Lazy BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder=bCryptPasswordEncoder;
         this.userRepository = userRepository;
         this.roleService = roleService;
     }
 
+
     @Override
-    public List<User> findAll() {
+    public User getUserByName(String name) {
+        return userRepository.finUsersByLogin(name);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     @Override
-    public User getUser(long id) {
-        return  userRepository.getById(id);
-
+    public User getUserById(Long id) {
+        return userRepository.findUserById(id);
     }
 
     @Override
-    public User save(User user) {
-        user.setPassword(WebSecurityConfig.getPasswordEncoder().encode(user.getPassword()));
-        return userRepository.save(user);
+    public void saveUser(User user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
     }
 
     @Override
-    public void update(Set<Role> roles, User userUpdate) {
-        userUpdate.setRoles(roles);
-        userUpdate.setPassword(WebSecurityConfig.getPasswordEncoder().encode(userUpdate.getPassword()));
-        userRepository.save(userUpdate);
-
+    public void updateUser(User user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
     }
 
     @Override
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-
-    @Override
-    public void delete(long id) {
+    public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
 
     @Override
-    public Set<Role> getAllRole() {
-        return new HashSet<>(roleService.getAllRoles());
-    }
-
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-        User user = userRepository.findByUsername(email);
-        if (user == null) {
-            throw new IllegalArgumentException(String.format("User '%s' not found", email));
-        }
-        return user;
-    }
-    public String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName();
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.finUsersByLogin(username);
     }
 }

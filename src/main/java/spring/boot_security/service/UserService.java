@@ -8,21 +8,16 @@ import java.util.List;
 import java.util.Set;
 
 public interface UserService extends UserDetailsService {
+    User getUserByName(String name);
 
-    List<User> findAll();
+    List<User> getAllUsers();
 
-    User getUserByUsername(String username);
+    User getUserById(Long id);
 
-    User getUser(long id);
+    void saveUser(User user);
 
-    User save(User user);
+    void updateUser(User user);
 
-    void update(Set<Role> roles, User userUpdate);
-
-    void delete(long id);
-    Set<Role> getAllRole();
-
-
-
+    void deleteUserById(Long id);
 
 }

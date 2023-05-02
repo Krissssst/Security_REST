@@ -1,5 +1,6 @@
 package spring.boot_security.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,8 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-@Getter
-@Setter
+@Data
 public class Role implements GrantedAuthority {
 
     @Id
@@ -20,9 +20,9 @@ public class Role implements GrantedAuthority {
 
     @Column
     private String role;
-
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
+//
+//    @ManyToMany(mappedBy = "roles")
+//    private Set<User> users;
 
     public Role(String role) {
         this.role = role;
