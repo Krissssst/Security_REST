@@ -1,6 +1,7 @@
 package spring.boot_security.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import spring.boot_security.models.User;
 import spring.boot_security.service.UserServiceImpl;
 
-@Controller
+@RestController
 @RequestMapping("/user")
 public class UserRestController {
 
@@ -21,12 +22,10 @@ public class UserRestController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public String getPageUser(@AuthenticationPrincipal User principal, Model model) {
-        model.addAttribute("user", userService.loadUserByUsername(principal.getName()));
-        model.addAttribute("principal", principal);
-        return "user";
+    @GetMapping("/user")
+    public ResponseEntity<User> getInfo(@AuthenticationPrincipal User user){
+        User users=userService.getUserByName(user.getName());
+        return ResponseEntity.ok().body(users);
+    }
     }
 
-
-}

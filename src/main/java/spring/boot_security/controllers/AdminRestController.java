@@ -2,6 +2,8 @@ package spring.boot_security.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,8 @@ import spring.boot_security.service.RoleServiceImpl;
 import spring.boot_security.service.UserService;
 import spring.boot_security.service.UserServiceImpl;
 
+import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -26,35 +30,36 @@ public class AdminRestController {
     private final BCryptPasswordEncoder encoder;
 
     @GetMapping()
-    public String allUser(Model model) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        model.addAttribute("users", userService.findAll());
-        model.addAttribute("roles", roleService.getAllRoles());
-        model.addAttribute("principal", user);
-        return "admin";
-    }
-//
-//    @GetMapping("/{id}")
-//    public User getUser(@PathVariable("id") long id) {
-//        return userService.getUser(id);
-//    }
-
-    @PostMapping("/new")
-    public String create(User user, @RequestParam("roles") Set<Role> roles) {
-        userService.update(roles, user);
-        return "redirect:/admin";
+    public ResponseEntity<List<User>> showAllUsers() {
+        return ResponseEntity.ok().body(userService.getAllUsers());
     }
 
-    @PostMapping("/edit")
-    public String update(@ModelAttribute("user") User user, @RequestParam("roles") Set<Role> roles) {
-        userService.update(roles, user);
-        return "redirect:/admin";
+    @GetMapping("/{id}")
+    public ResponseEntity<User> showUser(@PathVariable("id") long id) {
+        return new ResponseEntity<User>(userService.getUserById(id), HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> create(@Valid @RequestBody User user) {
+        userService.saveUser(user);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    @PutMapping("/patch")
+    public ResponseEntity<Void> update(@Valid @RequestBody User user) {
+        userService.saveUser(user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") long id) {
-        userService.delete(id);
-        return "redirect:/admin";
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        userService.deleteUserById(id);
+        return new ResponseEntity <>(HttpStatus.OK);
+    }
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> getRoles(){
+        return ResponseEntity.ok().body(roleService.getAllRoles());
     }
 
 }
