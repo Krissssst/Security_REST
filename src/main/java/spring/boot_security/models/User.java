@@ -22,18 +22,23 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotEmpty(message = "Name should not be empty ")
     @Size(min = 2, max = 30, message = "Name should be between 2 and 30 characters")
     @Column(name = "name")
     private String name;
+
     @Min(value = 0, message = "Age should be greater than 0")
     @Column(name = "age")
     private int age;
+
     @NotEmpty(message = "SurName should not be empty")
     @Column(name = "surname")
     private String surname;
+
     @Column(name = "password")
     private String password;
+
     @Column(name = "email")
     @Email
     private String username;
@@ -47,8 +52,7 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(Long id, String name, int age, String surname, String password, String username, Set<Role> roles) {
-        this.id = id;
+    public User(String name, int age, String surname, String password, String username, Set<Role> roles) {
         this.name = name;
         this.age = age;
         this.surname = surname;
@@ -56,33 +60,7 @@ public class User implements UserDetails {
         this.username = username;
         this.roles = roles;
     }
-    //    public String getRolesList() {
-//        StringBuilder sb = new StringBuilder();
-//        for (Role role : this.getRoles()) {
-//            sb.append(role.getRole());
-//        }
-//        return sb.toString();
-//    }
 
-    //    public Set<Role> getRoles() {
-//        return roles;
-//    }
-//
-//    public void setRoles(Set<Role> roles) {
-//        this.roles = roles;
-//    }
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                ", surname='" + surname + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + username + '\'' +
-                ", roles=" + roles +
-                '}';
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -113,25 +91,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(getId(), user.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
-    }
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    public String getRole() {
-//        return String.valueOf(roles);
-//    }
-
 
 }

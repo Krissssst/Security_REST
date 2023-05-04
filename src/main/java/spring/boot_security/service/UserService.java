@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 public interface UserService extends UserDetailsService {
-    User getUserByName(String name);
 
     List<User> getAllUsers();
 
@@ -19,5 +18,6 @@ public interface UserService extends UserDetailsService {
     void updateUser(User user);
 
     void deleteUserById(Long id);
+
 
 }
